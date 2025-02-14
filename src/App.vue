@@ -25,10 +25,8 @@ export default {
 	},
 	created() {
 		console.log("created")
-	},
-	created() {
 		if (this.isAuthenticated) {
-			this.$router.push("/home")
+			this.$router.push("/home") //if authenticated, send to the home page
 		}
 	},
 	methods: {
