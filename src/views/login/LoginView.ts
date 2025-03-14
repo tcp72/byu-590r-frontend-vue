@@ -1,5 +1,3 @@
-import { useRouter } from 'vue-router' //added
-
 export default {
     name: 'LoginView',
     emits: ['authenticate'],
@@ -10,57 +8,120 @@ export default {
             errorMsg: '',
             password: '',
             email: '',
-            dialog: false,
+            forgotEmail: '',
+            passwordResetDialog: false,
+            submitForgotPasswordLoading: false,
+            registerDialog: false,
             isLoading: false,
-            emailRules: [
-                (value) => !!value || 'Required.',
-                (value) => (value && value.length >= 3) || 'Min 3 characters',
-            ],
-            passwordRules: [
-                (value) => !!value || 'Required.',
-                (value) => (value && value.length >= 8) || 'Min 8 characters',
-            ],
+            isRegisterFormValid: false,
+            passwordResetFormIsValid: false,
+            registerFormIsLoading: false,
+            forgotEmailRules: {
+                forgotEmail: [
+                    (value) => !!value || 'Required.',
+                    (value) => (value && value.length >= 3) || 'Min 3 characters',
+                ],
+            },
+            loginRules: {
+                email: [
+                    (value) => !!value || 'Required.',
+                    (value) => (value && value.length >= 3) || 'Min 3 characters',
+                ],
+                password: [
+                    (value) => !!value || 'Required.',
+                    (value) => (value && value.length >= 8) || 'Min 8 characters',
+                ],
+            },
+            register: {
+                email: '',
+                name: '',
+                password: '',
+                c_password: '',
+            },
+            registerRules: {
+                email: [
+                    (value) => !!value || 'Required.',
+                    (value) => (value && value.length >= 3) || 'Min 3 characters',
+                ],
+                name: [
+                    (value) => !!value || 'Required.',
+                    (value) => (value && value.length >= 3) || 'Min 3 characters',
+                ],
+                password: [
+                    (value) => !!value || 'Required.',
+                    (value) => (value && value.length >= 8) || 'Min 8 characters',
+                ],
+                c_password: [
+                    (value) => !!value || 'type confirm password',
+                    (value) =>
+                        value === this.register.password ||
+                        'The password confirmation does not match.',
+                ],
+            },
             isFormValid: false,
-            hardCodedEmailForDemo: 'spiderman@gmail.com',
-            hardCodedPasswordForDemo: 'trees243',
         }
     },
-
-    setup() {
-        const router = useRouter() // Import Vue Router; chat suggested
-        return { router }
-    },
-
     methods: {
         submitLogin() {
             if (!this.isFormValid) {
                 return
             }
-
-            this.errorMsg = ''
-            if (
-                this.hardCodedPasswordForDemo === this.password &&
-                this.hardCodedEmailForDemo === this.email
-            ) {
-                this.alertType = 'success'
-                this.errorMsg = 'Login Sucess. Redirecting'
-                this.isLoading = true
-                console.log('loginview.ts I am here and submitting login')
-                setTimeout(() => {
-                    this.isAuthenticated = true
-                    this.$emit('authenticate', this.isAuthenticated)
-                    this.router.push({ path: '/home', query: { message: "I'm in!" } }) // Redirect to HomeView
-                }, 3000)
-            } else if (this.email === this.password) {
-                this.alertType = 'warning'
-                this.errorMsg = 'Your username and password can not be the same!'
-            } else {
-                this.alertType = 'error'
-                this.errorMsg = 'Login Failed! Can not Authenticate!'
+            const user = {
+                email: this.email,
+                password: this.password,
             }
+            this.errorMsg = ''
+            this.isLoading = true
+            this.$store.dispatch('auth/login', user).then(
+                () => {
+                    setTimeout(() => {
+                        window.location.reload()
+                    }, 2000)
+                },
+                (error) => {
+                    this.isLoading = false
+                    this.errorMsg =
+                        (error.response && error.response.data && error.response.data.message) ||
+                        error.message ||
+                        error.toString()
+                }
+            )
         },
-        forgotPassword() {
-            console.log('here in forgot password land')
+        submitForgotPassword() {
+            this.submitForgotPasswordLoading = true
+            this.$store.dispatch('auth/forgotPassword', this.forgotEmail).then(
+                () => {
+                    alert('success!')
+                    this.submitForgotPasswordLoading = false
+                    this.passwordResetDialog = false
+                },
+                (error) => {
+                    this.submitForgotPasswordLoading = false
+                }
+            )
+        },
+        submitRegister() {
+            if (!this.isRegisterFormValid) {
+                return
+            }
+            const register = {
+                name: this.register.name,
+                email: this.register.email,
+                password: this.register.password,
+                c_password: this.register.c_password,
+            }
+            this.registerFormIsLoading = true
+            this.$store.dispatch('auth/register', register).then(
+                () => {
+                    alert('success!')
+                    this.registerFormIsLoading = false
+                    this.registerDialog = false
+                },
+                (error) => {
+                    this.registerFormIsLoading = false
+                    alert('error!')
+                }
+            )
         },
     },
 }
