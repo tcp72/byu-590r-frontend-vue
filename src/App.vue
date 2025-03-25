@@ -72,11 +72,11 @@ export default {
             this.$router.push({ name: 'home' })
         }
     },
-    // created() {
-    //     if (this.authUser) {
-    //         this.getCurrentUser()
-    //     }
-    // },
+    created() {
+        if (this.authUser) {
+            this.getCurrentUser()
+        }
+    },
 
     //mounted() {},
 
@@ -120,22 +120,42 @@ export default {
                     this.profileIsUploading = false
                 })
         },
+        // getCurrentUser() {
+        //     this.profile.name = this.authUser.name
+        //     console.log('Getting current user, auth state:', this.authUser)
+
+        //     this.profile.title = this.title
+        //     this.$store.dispatch('user/getUser').then((response) => {
+        //         console.log('User response:', response)
+
+        //         if (response.avatar) {
+        //             console.log('Setting avatar to:', response.avatar)
+        //             this.$store.commit('auth/uploadAvatarSuccess', response.avatar)
+        //         }
+        //         if (!response.email_verified_at) {
+        //             this.showEmailNotVerifiedDialog = true
+        //         }
+        //     })
+        // },
+
         getCurrentUser() {
             this.profile.name = this.authUser.name
             console.log('Getting current user, auth state:', this.authUser)
 
             this.profile.title = this.title
-            this.$store.dispatch('user/getUser').then((response) => {
-                console.log('User response:', response)
+            this.$store
+                .dispatch('user/getUser')
+                .then((response) => {
+                    console.log('User response:', response)
+                    if (response.avatar) {
+                        console.log('Setting avatar to:', response.avatar)
 
-                if (response.avatar) {
-                    console.log('Setting avatar to:', response.avatar)
-                    this.$store.commit('auth/uploadAvatarSuccess', response.avatar)
-                }
-                if (!response.email_verified_at) {
-                    this.showEmailNotVerifiedDialog = true
-                }
-            })
+                        this.$store.commit('auth/uploadAvatarSuccess', response.avatar)
+                    }
+                })
+                .catch((error) => {
+                    this.logout()
+                })
         },
     },
 }
