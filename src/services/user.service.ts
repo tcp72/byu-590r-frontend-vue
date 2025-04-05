@@ -11,7 +11,7 @@ class UserService {
         let formData = new FormData()
         formData.append('image', image)
         return axios
-            .post(API_URL + 'user/upload_avatar', formData, { headers: authHeader('multipart') })
+            .post(API_URL + 'user/upload_avatar', formData, { headers: authHeader('multipart') }) //multipart is for uploading an image
             .then((response) => {
                 return response.data.results
             })

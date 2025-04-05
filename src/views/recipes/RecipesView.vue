@@ -1,41 +1,14 @@
 <template>
     <v-container>
-        <v-table>
-            <thead>
-                <tr>
-                    <th class="text-left">Recipe Picture</th>
-                    <th class="text-left">Recipe Name</th>
-                    <th class="text-left">Preparation Time</th>
-                </tr>
-            </thead>
-            <tbody>
-                <tr v-for="recipe in recipes" :key="recipe.id" style="height: 150px">
-                    <td class="py-6">
-                        <v-img
-                            v-if="recipe.file"
-                            :src="recipe.file"
-                            max-width="100"
-                            max-height="100"
-                        ></v-img>
-                        <v-icon v-else>mdi-image-off</v-icon>
-                    </td>
-                    <td class="py-6">{{ recipe.recipe_name }}</td>
-                    <td class="py-6">{{ recipe.total_time }}</td>
-                </tr>
-            </tbody>
-        </v-table>
-    </v-container>
-</template>
-
-<script src="./RecipesView.ts"></script>
-
-<!-- <template>
-    <v-container>
         <v-row>
             <v-col cols="12">
                 <h1 class="text-h3 mb-6 text-center">Check Out These Recipes</h1>
+                <v-btn color="success" class="mb-4" @click="openCreateDialog">
+                    Add New Recipe
+                </v-btn>
             </v-col>
         </v-row>
+        <!--iterate through recipes from store-->
         <v-row>
             <v-col v-for="recipe in recipes" :key="recipe.id" cols="12" sm="6" md="4" lg="3">
                 <v-card class="mx-auto" max-width="344" elevation="3">
@@ -44,15 +17,86 @@
                     <v-card-text>
                         <p>Delicious homemade recipe</p>
                     </v-card-text>
+
                     <v-card-actions>
-                        <v-btn color="primary" variant="text"> View Recipe </v-btn>
+                        <v-btn color="primary" variant="text">View Details</v-btn>
                         <v-spacer></v-spacer>
-                        <v-btn variant="text">Edit</v-btn>
+                        <!-- Edit button: calls openEditDialog method;  Delete button: calls confirmDelete method in RecipesView.ts -->
+                        <v-btn variant="text" @click="openEditDialog(recipe)">Edit</v-btn>
+                        <v-btn color="error" variant="text" @click="confirmDelete(recipe)"
+                            >Delete</v-btn
+                        >
                     </v-card-actions>
                 </v-card>
             </v-col>
         </v-row>
     </v-container>
+
+    <!--dialogs beneath here-->
+    <!-- Delete Confirmation Dialog -->
+    <v-dialog v-model="deleteDialog" max-width="500px">
+        <v-card>
+            <v-card-title>Delete Recipe</v-card-title>
+            <v-card-text>Are you sure you want to delete this recipe?</v-card-text>
+            <v-card-actions>
+                <v-spacer></v-spacer>
+                <v-btn color="blue-darken-1" variant="text" @click="deleteDialog = false"
+                    >Cancel</v-btn
+                >
+                <v-btn color="error" variant="text" @click="deleteRecipe">Delete</v-btn>
+            </v-card-actions>
+        </v-card>
+    </v-dialog>
+
+    <!-- Create/Edit Recipe Dialog -->
+    <v-dialog v-model="formDialog" max-width="600px">
+        <v-card>
+            <v-card-title>{{ editMode ? 'Edit Recipe' : 'Create Recipe' }}</v-card-title>
+            <v-card-text>
+                <v-form ref="form" v-model="valid">
+                    <v-text-field
+                        v-model="formData.recipe_name"
+                        label="Recipe Name"
+                        :rules="[(v) => !!v || 'Recipe name is required']"
+                        required
+                    ></v-text-field>
+
+                    <v-text-field
+                        v-model="formData.total_time"
+                        label="Total Time (minutes)"
+                        type="number"
+                        :rules="[(v) => !!v || 'Total time is required']"
+                        required
+                    ></v-text-field>
+
+                    <v-file-input
+                        v-if="!editMode || (editMode && changeImage)"
+                        v-model="recipeImage"
+                        label="Recipe Image"
+                        accept="image/*"
+                        :rules="[(v) => !!v || 'Recipe image is required']"
+                        required
+                    ></v-file-input>
+
+                    <v-checkbox
+                        v-if="editMode"
+                        v-model="changeImage"
+                        label="Change Recipe Image"
+                    ></v-checkbox>
+                </v-form>
+            </v-card-text>
+            <v-card-actions>
+                <v-spacer></v-spacer>
+                <v-btn color="blue-darken-1" variant="text" @click="formDialog = false"
+                    >Cancel</v-btn
+                >
+                <!-- Save button: When clicked, calls saveRecipe method in RecipesView.ts -->
+                <v-btn color="blue-darken-1" variant="text" @click="saveRecipe" :disabled="!valid"
+                    >Save</v-btn
+                >
+            </v-card-actions>
+        </v-card>
+    </v-dialog>
 </template>
 
 <script src="./RecipesView.ts"></script>
@@ -62,4 +106,4 @@
     font-size: 1.25rem;
     font-weight: 500;
 }
-</style> -->
+</style>
