@@ -4,23 +4,34 @@
             <v-col cols="12">
                 <h1 class="text-h3 mb-6 text-center">Check Out These Recipes</h1>
                 <v-btn color="success" class="mb-4" @click="openCreateDialog">
-                    Add New Recipe
+                    Create New Recipe
                 </v-btn>
             </v-col>
         </v-row>
-        <!--iterate through recipes from store-->
         <v-row>
+            <!--iterate through recipes from store-->
+
             <v-col v-for="recipe in recipes" :key="recipe.id" cols="12" sm="6" md="4" lg="3">
                 <v-card class="mx-auto" max-width="344" elevation="3">
                     <v-img :src="recipe.file" height="200" cover></v-img>
                     <v-card-title>{{ recipe.recipe_name }}</v-card-title>
+                    <v-card-subtitle>
+                        By: {{ recipe.author ? recipe.author.author_name : 'Unknown' }}
+                    </v-card-subtitle>
                     <v-card-text>
-                        <p>Delicious homemade recipe</p>
+                        <div>Total Time: {{ recipe.total_time }} minutes</div>
+                        <div v-if="recipe.ingredients && recipe.ingredients.length">
+                            <strong>Ingredients:</strong>
+                            <ul>
+                                <li v-for="ingredient in recipe.ingredients" :key="ingredient.id">
+                                    {{ ingredient.ingredient_name }} ({{
+                                        ingredient.pivot.quantity
+                                    }})
+                                </li>
+                            </ul>
+                        </div>
                     </v-card-text>
-
                     <v-card-actions>
-                        <v-btn color="primary" variant="text">View Details</v-btn>
-                        <v-spacer></v-spacer>
                         <!-- Edit button: calls openEditDialog method;  Delete button: calls confirmDelete method in RecipesView.ts -->
                         <v-btn variant="text" @click="openEditDialog(recipe)">Edit</v-btn>
                         <v-btn color="error" variant="text" @click="confirmDelete(recipe)"
@@ -69,13 +80,21 @@
                         required
                     ></v-text-field>
 
+                    <v-select
+                        v-model="formData.author_id"
+                        :items="authors"
+                        item-title="author_name"
+                        item-value="id"
+                        label="Author"
+                        :rules="[(v) => !!v || 'Author is required']"
+                        required
+                    ></v-select>
+
                     <v-file-input
                         v-if="!editMode || (editMode && changeImage)"
-                        v-model="recipeImage"
+                        @change="onNewFileChange"
                         label="Recipe Image"
                         accept="image/*"
-                        :rules="[(v) => !!v || 'Recipe image is required']"
-                        required
                     ></v-file-input>
 
                     <v-checkbox

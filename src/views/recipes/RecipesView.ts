@@ -1,5 +1,6 @@
 import { mapState } from 'vuex'
 import { useDisplay } from 'vuetify'
+import API_URL from '@/services/env'
 export default {
     name: 'RecipesView',
     // data() defines the component's reactive data properties (that we can reference beneath)
@@ -27,11 +28,14 @@ export default {
                 //get recipes from the state to this component
                 return this.$store.state.recipes.recipesList
             },
+            authors() {
+                return this.$store.state.recipes.authorsList
+            },
         }),
     },
     //this lifecycle hook is called after the instance is creted
     created() {
-        this.getRecipes() //Fetch recipes when component is created
+        this.getRecipes() //Fetch recipes when component is created; gets recipes and authors
     },
     methods: {
         // Dispatches action to fetch recipes from API
@@ -61,7 +65,7 @@ export default {
             this.formData = {
                 recipe_name: '',
                 total_time: '',
-                author_id: 5, // DO I NEED TO CHANGE THIS HERE??????? HOW DO I HANDLE IT DYNAMICALLY IN THE FUTURE????????????
+                author_id: '', // DO I NEED TO CHANGE THIS HERE??????? HOW DO I HANDLE IT DYNAMICALLY IN THE FUTURE????????????
             }
             this.recipeImage = null
             this.formDialog = true // Shows create form dialog
@@ -115,6 +119,17 @@ export default {
                 })
                 // This action is defined in recipes.module.ts and calls the API via recipes.service.ts
             }
+        },
+        onNewFileChange(event) {
+            this.recipeImage = null
+
+            if (!event || !event.target || !event.target.files) return // Safety check
+
+            const image = event.target.files || event.dataTransfer.files
+            if (!image.length) return
+
+            this.recipeImage = image[0]
+            console.log(this.recipeImage)
         },
     },
 }

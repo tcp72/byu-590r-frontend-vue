@@ -7,7 +7,10 @@ class RecipesService {
 
     getRecipes() {
         return axios.get(API_URL + 'recipes', { headers: authHeader() }).then((response) => {
-            return response.data.results //Extracting results from the response; confirm if .data.data or .data.results in base controller (mine is results)
+            return {
+                recipes: response.data.results.recipes, //Extracting results from the response; confirm if .data.data or .data.results in base controller (mine is results)
+                authors: response.data.results.authors,
+            }
         })
     }
     // Creates a new recipe //I think this is where the content for the actual postman request is being formed. Confirm??
@@ -34,6 +37,10 @@ class RecipesService {
                 },
             })
             .then((response) => {
+                console.log(
+                    'here is response.data.results in recipes service',
+                    response.data.results
+                )
                 return response.data.results
             })
     }
@@ -46,6 +53,11 @@ class RecipesService {
             .then((response) => {
                 return response.data.results
             })
+    }
+    getAuthors() {
+        return axios.get(API_URL + 'authors', { headers: authHeader() }).then((response) => {
+            return response.data.results
+        })
     }
 }
 

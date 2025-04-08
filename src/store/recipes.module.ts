@@ -1,6 +1,9 @@
 import recipeService from '../services/recipes.service'
 
-const initialState = { recipesList: [] }
+const initialState = {
+    recipesList: [],
+    authorsList: [],
+}
 
 export const recipes = {
     namespaced: true,
@@ -8,10 +11,16 @@ export const recipes = {
     actions: {
         // Fetches all recipes from the API
         getRecipes({ commit }) {
-            return recipeService.getRecipes().then((recipes) => {
+            return recipeService.getRecipes().then((data) => {
                 // When API call succeeds, commit mutation to update state
-                commit('setRecipes', recipes)
-                return Promise.resolve(recipes)
+                commit('setRecipes', data.recipes) //confirm if this should be data.recipes or just recipes. Same w authors
+                commit('setAuthors', data.authors)
+                console.log(
+                    'here is data.authors in recipes.module after the .then()',
+                    data.authors
+                )
+                console.log('and here is data.recipes', data.recipes)
+                return Promise.resolve(data)
             })
         },
         // Creates a new recipe
@@ -38,6 +47,13 @@ export const recipes = {
                 return Promise.resolve()
             })
         },
+        //get authors
+        // getAuthors({ commit }) {
+        //     return recipeService.getAuthors().then((authors) => {
+        //         commit('setAuthors', authors)
+        //         return Promise.resolve(authors)
+        //     })
+        // },
     },
     mutations: {
         // Sets the entire recipes list in state
@@ -58,6 +74,9 @@ export const recipes = {
         // Removes a recipe from the state
         deleteRecipe(state, id) {
             state.recipesList = state.recipesList.filter((recipe) => recipe.id !== id)
+        },
+        setAuthors(state, authors) {
+            state.authorsList = authors
         },
     },
 }
