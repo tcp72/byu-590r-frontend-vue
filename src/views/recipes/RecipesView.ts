@@ -6,6 +6,7 @@ export default {
     // data() defines the component's reactive data properties (that we can reference beneath)
     data() {
         return {
+            fileIsUpdating: false, //for the picture
             deleteDialog: false, // Controls visibility of delete confirmation dialog
             formDialog: false, // Controls visibility of create/edit form dialog
             editMode: false, // Determines if form is in edit or create mode
@@ -18,6 +19,7 @@ export default {
                 recipe_name: '',
                 total_time: '',
                 author_id: 1, // Default author ID
+                file: '', //for the image
             },
         }
     },
@@ -97,9 +99,9 @@ export default {
             })
 
             // Add image if provided
-            if (this.recipeImage && (this.changeImage || !this.editMode)) {
-                formData.append('file', this.recipeImage)
-            }
+            // if (this.recipeImage && (this.changeImage || !this.editMode)) {
+            //     formData.append('file', this.recipeImage)
+            // }
 
             if (this.editMode) {
                 // Dispatch update action to Vuex store
@@ -120,16 +122,31 @@ export default {
                 // This action is defined in recipes.module.ts and calls the API via recipes.service.ts
             }
         },
-        onNewFileChange(event) {
-            this.recipeImage = null
+        onNewRecipeFileChange(event) {
+            this.formData.file = null
 
-            if (!event || !event.target || !event.target.files) return // Safety check
+            if (!event || !event.target || !event.target.files) return
 
             const image = event.target.files || event.dataTransfer.files
             if (!image.length) return
 
-            this.recipeImage = image[0]
-            console.log(this.recipeImage)
+            this.formData.file = image[0]
+        },
+
+        onExistingFileChange(e) {
+            var image = e.target.files || e.dataTransfer.files
+            if (!image.length) return
+
+            this.formData.file = image[0]
+            this.fileIsUpdating = true
+            this.$store
+                .dispatch('recipes/updateRecipeFile', this.formData) //that function is from the module
+                .then(() => {
+                    this.fileIsUpdating = false
+                })
+                .catch((error) => {
+                    this.fileIsUpdating = false
+                })
         },
     },
 }

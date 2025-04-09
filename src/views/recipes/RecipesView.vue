@@ -90,12 +90,30 @@
                         required
                     ></v-select>
 
-                    <v-file-input
+                    <!-- <v-file-input
                         v-if="!editMode || (editMode && changeImage)"
                         @change="onNewFileChange"
                         label="Recipe Image"
                         accept="image/*"
-                    ></v-file-input>
+                        :rules="[(v) => !!v || 'Recipe image is required']"
+                    ></v-file-input> -->
+
+                    <v-file-input
+                        v-if="formData.id"
+                        accept="image/*"
+                        label="Recipe Image"
+                        @change="onExistingFileChange"
+                        :loading="fileIsUpdating"
+                    >
+                    </v-file-input>
+                    <v-file-input
+                        v-else
+                        accept="image/*"
+                        label="Recipe Image"
+                        @change="onNewRecipeFileChange"
+                        :loading="fileIsUpdating"
+                    >
+                    </v-file-input>
 
                     <v-checkbox
                         v-if="editMode"

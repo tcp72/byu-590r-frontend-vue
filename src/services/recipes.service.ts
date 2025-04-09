@@ -44,6 +44,19 @@ class RecipesService {
                 return response.data.results
             })
     }
+    //update recipe image
+    updateRecipeFile(recipe) {
+        let formData = new FormData()
+        formData.append('file', recipe.file)
+        return axios
+            .post(API_URL + 'recipes/' + recipe.id + '/update_recipe_picture', formData, {
+                //this is the name in the controller that is called
+                headers: authHeader(),
+            })
+            .then((response) => {
+                return response.data.results
+            })
+    }
     // Deletes a recipe
     deleteRecipe(id) {
         return axios

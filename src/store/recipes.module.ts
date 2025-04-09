@@ -39,6 +39,14 @@ export const recipes = {
                 return Promise.resolve(recipe)
             })
         },
+        updateRecipeFile({ commit, getters }, recipe) {
+            return recipeService.updateRecipeFile(recipe).then((response) => {
+                response.recipe.index = getters.getRecipeStateIndexById(response.recipe.id)
+                commit('updateRecipePicture', response.recipe)
+                return Promise.resolve(response.book)
+            })
+        },
+
         // Deletes a recipe
         deleteRecipe({ commit }, id) {
             return recipeService.deleteRecipe(id).then(() => {
@@ -77,6 +85,16 @@ export const recipes = {
         },
         setAuthors(state, authors) {
             state.authorsList = authors
+        },
+        updateRecipePicture(state, recipe) {
+            state.recipesList[recipe.index].file = recipe.file
+        },
+    },
+    getters: {
+        getRecipeStateIndexById: (state) => (recipeID) => {
+            return state.recipesList.findIndex((recipe) => {
+                return recipe.id === recipeID
+            })
         },
     },
 }
