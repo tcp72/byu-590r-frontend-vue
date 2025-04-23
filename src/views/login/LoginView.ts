@@ -25,10 +25,11 @@ export default {
             loginRules: {
                 email: [
                     (value) => !!value || 'Required.',
-                    (value) => (value && value.length >= 3) || 'Min 3 characters',
+                    (value) => (value && value.length >= 5) || 'Min 5 characters',
+                    (value) => /.+@.+\..+/.test(value) || 'E-mail must be valid',
                 ],
                 password: [
-                    (value) => !!value || 'Required.',
+                    (value) => !!value || 'Password is required.',
                     (value) => (value && value.length >= 8) || 'Min 8 characters',
                 ],
             },

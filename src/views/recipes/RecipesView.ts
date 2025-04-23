@@ -87,7 +87,7 @@ export default {
             this.formDialog = true // Shows edit form dialog
         },
 
-        // Called when save button is clicked in create/edit form dialog PLEASE EXPLAIN THIS METHOD A LITTLE MORE
+        // Called when save button is clicked in create/edit form dialog
         saveRecipe() {
             if (!this.$refs.form.validate()) return // Form validation
 
